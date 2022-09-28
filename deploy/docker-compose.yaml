@@ -1,0 +1,63 @@
+version: "3"
+
+volumes:
+  prometheus_data: {}
+  grafana_data: {}
+
+networks:
+  frontend:
+  backend:
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    links:
+      - alertmanager:alertmanager
+    networks:
+      - backend
+    restart: unless-stopped
+
+  alertmanager:
+    image: prom/alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    networks:
+      - backend
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+
+  grafana:
+    image: grafana/grafana
+    user: "472"
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    env_file:
+      - grafana/config.env
+    networks:
+      - backend
+      - frontend
+    restart: unless-stopped
+
+  mariadb:
+    image: mariadb
+    environment:
+      MARIADB_ROOT_PASSWORD: admin
