@@ -13,9 +13,19 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/mysqldialect"
+	"github.com/uptrace/bun/extra/bundebug"
+	_ "whdsl/docs"
 )
 
-func NewInitializedBackendFromEnv(ctx context.Context) (*Backend, error) {
+const (
+	timestampAsc = "created_at ASC"
+)
+
+type Model interface {
+	Init(ctx context.Context, db *bun.DB) error
+}
+
+func NewInitializedBackendFromEnv(ctx context.Context, models ...Model) (*Backend, error) {
 	c, cErr := NewConfigFromEnv()
 	if cErr != nil {
 		return nil, cErr
@@ -26,7 +36,12 @@ func NewInitializedBackendFromEnv(ctx context.Context) (*Backend, error) {
 		return nil, bErr
 	}
 
-	return b, b.Init(ctx)
+	b.bunDB.AddQueryHook(bundebug.NewQueryHook(
+		bundebug.WithVerbose(true),
+		bundebug.FromEnv("BUNDEBUG"),
+	))
+
+	return b, nil
 }
 
 func NewBackendFromConfig(c *Config) (*Backend, error) {
@@ -80,12 +95,12 @@ type Backend struct {
 	bunDB *bun.DB
 }
 
-func (b *Backend) List(ctx context.Context, slice *[]Model) error {
-	return b.bunDB.NewSelect().Model(slice).Scan(ctx)
+func (b *Backend) List() *bun.SelectQuery {
+	return b.bunDB.NewSelect().OrderExpr(timestampAsc)
 }
 
-func (b *Backend) BindByID(ctx context.Context, id string, model Model) error {
-	return b.bunDB.NewSelect().Model(model).WherePK().Scan(ctx, model)
+func (b *Backend) BindByID(ctx context.Context,id string, model Model) error {
+	return b.bunDB.NewSelect().Model(model).Where("id LIKE ?", id).Scan(ctx, model)
 }
 
 func (b *Backend) InsertOrUpdate(ctx context.Context, model Model) error {
@@ -108,12 +123,8 @@ func (b *Backend) Delete(ctx context.Context, model Model) error {
 	return err
 }
 
-func (b *Backend) Init(ctx context.Context) error {
-	if err := b.initModels(ctx); err != nil {
-		return err
-	}
-
-	return nil
+func (b *Backend) ResetModel(ctx context.Context, model Model) error {
+	return b.bunDB.ResetModel(ctx, model)
 }
 
 func (b *Backend) Close() error {

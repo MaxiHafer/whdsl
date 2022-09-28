@@ -2,17 +2,33 @@ package article
 
 import (
 	"context"
-
 	"whdsl/pkg/mariadb"
 )
 
 type IRepository interface{}
 
-type Repository struct {
-	db mariadb.Backend
+func NewRepository(b *mariadb.Backend) *Repository {
+	return &Repository{
+		db: b,
+	}
 }
 
-func (r *Repository) GetByID(ctx context.Context, id string) (*Article, error) {
+type Repository struct {
+	db *mariadb.Backend
+}
+
+func (r *Repository) ListArticles(ctx context.Context) ([]*Article, error) {
+	var articles []*Article
+
+	err := r.db.List().Model(&articles).Scan(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return articles, err
+}
+
+func (r *Repository) GetArticleByID(ctx context.Context, id string) (*Article, error) {
 	article := new(Article)
 
 	err := r.db.BindByID(ctx, id, article)

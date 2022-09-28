@@ -60,4 +60,16 @@ services:
   mariadb:
     image: mariadb
     environment:
-      MARIADB_ROOT_PASSWORD: admin
+      MARIADB_ROOT_PASSWORD: mariadbroot
+      MARIADB_DATABASE: whdsl_data
+    networks:
+      - backend
+    ports:
+      - "3306:3306"
+
+  adminer:
+    image: adminer
+    networks:
+      - backend
+    ports:
+      - "8081:8080"
