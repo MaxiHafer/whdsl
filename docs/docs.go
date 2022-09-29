@@ -21,6 +21,9 @@ const docTemplate = `{
         "/articles": {
             "get": {
                 "description": "gets accounts",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -45,11 +48,52 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "description": "creates article",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "articles"
+                ],
+                "summary": "Create article",
+                "parameters": [
+                    {
+                        "description": "Add Article",
+                        "name": "article",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/article.addArticle"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         },
         "/articles/{id}": {
             "get": {
                 "description": "gets an article by ID",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -113,6 +157,23 @@ const docTemplate = `{
                 "updated_at": {
                     "type": "string",
                     "example": "1985-04-12T23:20:50.52Z"
+                }
+            }
+        },
+        "article.addArticle": {
+            "type": "object",
+            "required": [
+                "min_amount",
+                "name"
+            ],
+            "properties": {
+                "min_amount": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "kebab"
                 }
             }
         }

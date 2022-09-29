@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/mysqldialect"
-	"github.com/uptrace/bun/extra/bundebug"
 	_ "whdsl/docs"
 )
 
@@ -35,12 +34,7 @@ func NewInitializedBackendFromEnv(ctx context.Context, models ...Model) (*Backen
 	if bErr != nil {
 		return nil, bErr
 	}
-
-	b.bunDB.AddQueryHook(bundebug.NewQueryHook(
-		bundebug.WithVerbose(true),
-		bundebug.FromEnv("BUNDEBUG"),
-	))
-
+	
 	return b, nil
 }
 

@@ -24,6 +24,18 @@ definitions:
     - name
     - updated_at
     type: object
+  article.addArticle:
+    properties:
+      min_amount:
+        example: 1
+        type: integer
+      name:
+        example: kebab
+        type: string
+    required:
+    - min_amount
+    - name
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -34,6 +46,8 @@ info:
 paths:
   /articles:
     get:
+      consumes:
+      - application/json
       description: gets accounts
       produces:
       - application/json
@@ -51,8 +65,35 @@ paths:
       summary: List articles
       tags:
       - articles
+    post:
+      consumes:
+      - application/json
+      description: creates article
+      parameters:
+      - description: Add Article
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/article.addArticle'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Create article
+      tags:
+      - articles
   /articles/{id}:
     get:
+      consumes:
+      - application/json
       description: gets an article by ID
       parameters:
       - description: Article ID
