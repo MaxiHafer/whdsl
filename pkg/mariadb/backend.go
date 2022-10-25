@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/mysqldialect"
-	_ "whdsl/docs"
 )
 
 const (

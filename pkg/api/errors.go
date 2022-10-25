@@ -1,14 +1,20 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func ErrNotFound(c *gin.Context) {
-	c.String(http.StatusNotFound, "resource not found")
+func ErrNotFound(c *gin.Context, format string, args... any) {
+	c.AbortWithStatusJSON(http.StatusNotFound, fmt.Sprintf(format, args))
 }
 
-func ErrInternal(c *gin.Context) {
-	c.AbortWithStatusJSON(http.StatusInternalServerError, "internal server error")
+func ErrInternal(c *gin.Context, format string, args ... any) {
+	c.AbortWithStatusJSON(http.StatusInternalServerError, fmt.Sprintf(format, args))
+}
+
+func ErrBadRequest(c *gin.Context, format string, args... any) {
+	c.AbortWithStatusJSON(http.StatusBadRequest, fmt.Sprintf(format, args))
 }

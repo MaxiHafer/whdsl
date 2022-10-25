@@ -2,11 +2,11 @@ package article
 
 import (
 	"database/sql"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	"net/http"
-	"whdsl/pkg/api"
 )
 
 func NewHandler(g *gin.RouterGroup, repo *Repository) *Handler {
@@ -21,98 +21,101 @@ type Handler struct {
 	r    *gin.RouterGroup
 }
 
-func (h *Handler) RegisterRoutes() {
-	h.r.GET("/", h.OnListArticles)
-	h.r.GET("/:id", h.OnGetArticleByID)
-	h.r.POST("/", h.OnCreateArticle)
+type Body struct {
+	Name          string `json:"name" example:"Kühlschrank"`
+	MinimumAmount int    `json:"min_amount" example:"100"`
 }
 
-// OnGetArticleByID godoc
-// @Summary     Show an article
-// @Description gets an article by ID
-// @Tags        articles
-// @Accept      json
-// @Produce     json
-// @Param       id  path     string true "Article ID"
-// @Success     200 {object} Article
-// @Failure     404 {string} string
-// @Router      /articles/{id} [get]
-func (h *Handler) OnGetArticleByID(c *gin.Context) {
+func (h *Handler) RegisterRoutes() {
+	h.r.GET("/", h.OnListArticles)
+	h.r.GET("/:id", h.OnGetArticle)
+	h.r.POST("/", h.OnCreateArticle)
+	h.r.PUT("/:id", h.OnUpdateArticle)
+	h.r.DELETE("/:id", h.OnDeleteArticle)
+}
+
+func (h *Handler) OnGetArticle(c *gin.Context) {
 	article, err := h.repo.GetArticleByID(c, c.Param("id"))
 	if errors.Is(err, sql.ErrNoRows) {
-		api.ErrNotFound(c)
+		_ = c.AbortWithError(http.StatusNotFound, errors.Errorf("no article found for id: %s", c.Param("id")))
 	}
 	if err != nil {
-		_ = c.Error(err)
-		return
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed loading article for id: %s", c.Param("id")))
 	}
 
 	c.JSON(http.StatusOK, article)
 }
 
-// OnListArticles godoc
-// @Summary     List articles
-// @Description gets accounts
-// @Tags        articles
-// @Accept      json
-// @Produce     json
-// @Success     200 {array}  Article
-// @Failure     404 {string} string
-// @Router      /articles [get]
 func (h *Handler) OnListArticles(c *gin.Context) {
 	articles, err := h.repo.ListArticles(c)
 	if errors.Is(err, sql.ErrNoRows) {
-		api.ErrNotFound(c)
+		_ = c.AbortWithError(http.StatusNotFound, errors.Errorf("no articles present in repo"))
 	}
 
 	if err != nil {
-		_ = c.Error(err)
-		return
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed loading articles from repo"))
 	}
 
 	c.JSON(http.StatusOK, articles)
 }
 
-type addArticle struct {
-	Name          string `json:"name" example:"kebab"`
-	MinimumAmount int    `json:"min_amount" example:"1"`
-}
-
-// OnCreateArticle godoc
-// @Summary     Create article
-// @Description creates article
-// @Tags        articles
-// @Accept      json
-// @Produce     json
-// @Param       article body     addArticle true "Add Article"
-// @Success     201     {object} string
-// @Failure     400     {string} string
-// @Router      /articles [post]
 func (h *Handler) OnCreateArticle(c *gin.Context) {
-	addArticle := &addArticle{}
-	if err := c.BindJSON(addArticle); err != nil {
-		_ = c.AbortWithError(http.StatusBadRequest, err)
-		return
+	body := Body{}
+
+	if err := c.Bind(&body); err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, errors.Wrapf(err,"failed binding request body"))
 	}
-	article := &Article{
+
+	article := &Model{
 		ID:            uuid.NewString(),
-		Name:          addArticle.Name,
-		MinimumAmount: addArticle.MinimumAmount,
+		Name:          body.Name,
+		MinimumAmount: body.MinimumAmount,
 	}
 
 	if err := h.repo.Store(c, article); err != nil {
-		api.ErrInternal(c)
-		return
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.Errorf("failed storing article in respository"))
 	}
 
 	c.JSON(http.StatusCreated, article.ID)
 }
 
-// OnUpdateArticle godoc
-// @Summary     Update article
-// @Description updates article
-// @Tags        articles
-// @Accept      json
-// @Produce     json
-// @Param       article body updateArticle true "Update Article"
-// @Success     200     {s}
+func (h *Handler) OnUpdateArticle(c *gin.Context) {
+	body := Body{}
+	if err := c.BindJSON(&body); err != nil {
+		_ = c.AbortWithError(http.StatusBadRequest, errors.Wrapf(err, "failed binding request body"))
+	}
+
+	article, err := h.repo.GetArticleByID(c, c.Param("id"))
+	if errors.Is(err, sql.ErrNoRows) {
+		_ = c.AbortWithError(http.StatusNotFound, errors.Errorf("no article found for id: %s",c.Param("id")))
+	}
+
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed loading article from repo"))
+	}
+
+	article.Name = body.Name
+	article.MinimumAmount = body.MinimumAmount
+
+	if err := h.repo.Store(c, article); err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed while storing article in repository"))
+		return
+	}
+
+	c.JSON(http.StatusOK, article.ID)
+}
+
+
+func (h *Handler) OnDeleteArticle(c *gin.Context) {
+	err := h.repo.DeleteByID(c, c.Param("id"))
+
+	if errors.Is(err, sql.ErrNoRows) {
+		_ = c.AbortWithError(http.StatusNotFound, errors.Errorf("no article found for id: %s",c.Param("id")))
+	}
+
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, errors.Wrapf(err, "failed while deleting article from repo"))
+	}
+
+	c.Status(http.StatusOK)
+}

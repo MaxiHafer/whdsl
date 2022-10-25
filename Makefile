@@ -1,4 +1,4 @@
-DOCKER_COMPOSE := docker-compose -p whdsl -f deploy/docker-compose.yaml
+DOCKER_COMPOSE := docker compose -p whdsl -f deploy/docker-compose.yaml
 
 .PHONY: run
 run: all
@@ -14,9 +14,11 @@ build:
 .PHONY: run
 run: all
 
-.PHONY: swagger
-swagger:
-	go run github.com/swaggo/swag/cmd/swag@latest init --dir cmd/whdsl,$(shell pwd) --output docs --requiredByDefault
+.PHONY: client
+client:
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
+	oapi-codegen -generate client,types -o ./pkg/client/client_gen.go -package client --old-config-style ./openapi.yaml
+
 
 .PHONY: compose
 compose:

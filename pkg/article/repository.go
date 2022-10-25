@@ -2,6 +2,7 @@ package article
 
 import (
 	"context"
+
 	"whdsl/pkg/mariadb"
 )
 
@@ -17,8 +18,8 @@ type Repository struct {
 	db *mariadb.Backend
 }
 
-func (r *Repository) ListArticles(ctx context.Context) ([]*Article, error) {
-	var articles []*Article
+func (r *Repository) ListArticles(ctx context.Context) ([]*Model, error) {
+	var articles []*Model
 
 	err := r.db.List().Model(&articles).Scan(ctx)
 	if err != nil {
@@ -28,8 +29,8 @@ func (r *Repository) ListArticles(ctx context.Context) ([]*Article, error) {
 	return articles, err
 }
 
-func (r *Repository) GetArticleByID(ctx context.Context, id string) (*Article, error) {
-	article := new(Article)
+func (r *Repository) GetArticleByID(ctx context.Context, id string) (*Model, error) {
+	article := new(Model)
 
 	err := r.db.BindByID(ctx, id, article)
 	if err != nil {
@@ -40,9 +41,9 @@ func (r *Repository) GetArticleByID(ctx context.Context, id string) (*Article, e
 }
 
 func (r *Repository) DeleteByID(ctx context.Context, id string) error {
-	return r.db.Delete(ctx, &Article{ID: id})
+	return r.db.Delete(ctx, &Model{ID: id})
 }
 
-func (r *Repository) Store(ctx context.Context, article *Article) error {
+func (r *Repository) Store(ctx context.Context, article *Model) error {
 	return r.db.InsertOrUpdate(ctx, article)
 }

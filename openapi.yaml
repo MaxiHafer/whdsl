@@ -1,0 +1,276 @@
+openapi: 3.0.1
+info:
+  title: WHDSL Inventory API
+  description: This is a simple API for providing inventory management capabilities
+  contact:
+    name: API Support
+  version: "1.0"
+servers:
+  - url: http://localhost:8080/api/v1
+paths:
+  /articles:
+    get:
+      tags:
+        - articles
+      summary: List all articles
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Article'
+    post:
+      tags:
+        - articles
+      summary: Create a new article
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article'
+        required: true
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: string
+  /articles/{id}:
+    get:
+      tags:
+        - articles
+      summary: Get an article
+      parameters:
+        - name: id
+          in: path
+          description: Article ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Article'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+    put:
+      tags:
+        - articles
+      summary: Update an article
+      parameters:
+        - name: id
+          in: path
+          description: Article ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+    delete:
+      tags:
+        - articles
+      summary: Delete an article
+      parameters:
+        - name: id
+          in: path
+          description: Article ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+  /transactions:
+    get:
+      tags:
+        - transactions
+      summary: List all transactions
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+    post:
+      tags:
+        - transactions
+      summary: Create a new trasaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+        required: true
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: string
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: string
+  /transactions/{id}:
+    get:
+      tags:
+        - transactions
+      summary: Get an transaction
+      parameters:
+        - name: id
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+    put:
+      tags:
+        - transactions
+      summary: Update a transaction
+      parameters:
+        - name: id
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+    delete:
+      tags:
+        - transactions
+      summary: Delete a transaction
+      parameters:
+        - name: id
+          in: path
+          description: Transaction ID
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: string
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        minAmount:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        articleId:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum:
+            - "IN"
+            - "OUT"
+        amount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+
+
+

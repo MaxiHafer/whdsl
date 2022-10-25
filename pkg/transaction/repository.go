@@ -16,8 +16,8 @@ type Repository struct {
 	db *mariadb.Backend
 }
 
-func (r *Repository) GetTransactionByID(ctx context.Context, id string) (*Transaction, error) {
-	transaction := new(Transaction)
+func (r *Repository) GetTransactionByID(ctx context.Context, id string) (*Model, error) {
+	transaction := new(Model)
 
 	err := r.db.BindByID(ctx,id, transaction)
 	if err != nil {
@@ -27,8 +27,8 @@ func (r *Repository) GetTransactionByID(ctx context.Context, id string) (*Transa
 	return transaction, nil
 }
 
-func (r *Repository) ListTransactions(ctx context.Context) ([]*Transaction, error) {
-	var transactions []*Transaction
+func (r *Repository) ListTransactions(ctx context.Context) ([]*Model, error) {
+	var transactions []*Model
 
 	err := r.db.List().Model(&transactions).Scan(ctx)
 	if err != nil {
@@ -39,9 +39,9 @@ func (r *Repository) ListTransactions(ctx context.Context) ([]*Transaction, erro
 }
 
 func (r *Repository) DeleteByID(ctx context.Context, id string) error {
-	return r.db.Delete(ctx, &Transaction{ID: id})
+	return r.db.Delete(ctx, &Model{ID: id})
 }
 
-func (r *Repository) Store(ctx context.Context, transaction *Transaction) error {
+func (r *Repository) Store(ctx context.Context, transaction *Model) error {
 	return r.db.InsertOrUpdate(ctx, transaction)
 }

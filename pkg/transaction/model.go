@@ -2,23 +2,24 @@ package transaction
 
 import (
 	"context"
+	"time"
+
 	"github.com/google/uuid"
 	"github.com/uptrace/bun"
-	"time"
 
 	"whdsl/pkg/mariadb"
 )
 
-var _ mariadb.Model = &Transaction{}
+var _ mariadb.Model = &Model{}
 
-func NewModel() *Transaction {
-	return &Transaction{
+func NewModel() *Model {
+	return &Model{
 		ID: uuid.NewString(),
 	}
 }
 
-type Transaction struct {
-	bun.BaseModel
+type Model struct {
+	bun.BaseModel `swaggerignore:"true"`
 	ID        string    `bun:",pk,type:varchar(36)"`
 	ArticleID string    `bun:",notnull,type:varchar(36)"`
 	Direction Direction `bun:",notnull,type:tinyint(1)"`
@@ -28,16 +29,16 @@ type Transaction struct {
 	UpdatedAt time.Time `bun:",nullzero"`
 }
 
-func (t *Transaction) BeforeAppendModel(ctx context.Context, query bun.Query) error {
+func (m *Model) BeforeAppendModel(ctx context.Context, query bun.Query) error {
 	switch query.(type) {
 	case *bun.InsertQuery:
-		t.CreatedAt = time.Now()
+		m.CreatedAt = time.Now()
 	case *bun.UpdateQuery:
-		t.UpdatedAt = time.Now()
+		m.UpdatedAt = time.Now()
 	}
 	return nil
 }
 
-func (t *Transaction) Init(ctx context.Context, db *bun.DB) error {
-	return db.ResetModel(ctx, (*Transaction)(nil))
+func (m *Model) Init(ctx context.Context, db *bun.DB) error {
+	return db.ResetModel(ctx, (*Model)(nil))
 }
