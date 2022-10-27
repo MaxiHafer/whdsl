@@ -246,12 +246,12 @@ type GinServerOptions struct {
 }
 
 // RegisterHandlers creates http.Handler with routing matching OpenAPI spec.
-func RegisterHandlers(router *gin.Engine, si ServerInterface) *gin.Engine {
+func RegisterHandlers(router *gin.RouterGroup, si ServerInterface) *gin.RouterGroup {
 	return RegisterHandlersWithOptions(router, si, GinServerOptions{})
 }
 
 // RegisterHandlersWithOptions creates http.Handler with additional options
-func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options GinServerOptions) *gin.Engine {
+func RegisterHandlersWithOptions(router *gin.RouterGroup, si ServerInterface, options GinServerOptions) *gin.RouterGroup {
 	wrapper := ServerInterfaceWrapper{
 		Handler:            si,
 		HandlerMiddlewares: options.Middlewares,
@@ -280,9 +280,7 @@ func RegisterHandlersWithOptions(router *gin.Engine, si ServerInterface, options
 	router.PUT(options.BaseURL+"/transactions/:id", wrapper.PutTransactionsId)
 
 	return router
-}
-
-// Base64 encoded, gzipped, json marshaled Swagger object
+} // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
 	"H4sIAAAAAAAC/+xWTY/bNhD9K8S0R3UltzkEujldNDWaJotmgx6KPUzEWZuB+FFy5MZY6L8XpCzbsje2",

@@ -3,6 +3,10 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"log"
+	"net/http"
+	"os"
+	"path"
 )
 
 //go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest --config=types.cfg.yaml ../../whdsl-api.yaml
@@ -15,6 +19,15 @@ func NewService() *Service {
 }
 
 type Service struct {
+}
+
+func (s *Service) GetSwagger(c *gin.Context) {
+	log.Println("trying to serve openapi-spec")
+	wd, err := os.Getwd()
+	if err != nil {
+		_ = c.AbortWithError(http.StatusInternalServerError, err)
+	}
+	c.File(path.Join(wd,"whdsl-api.yaml"))
 }
 
 func (s *Service) GetMetrics(c *gin.Context) {

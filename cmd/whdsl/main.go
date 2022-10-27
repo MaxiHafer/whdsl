@@ -3,10 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
+	"github.com/maxihafer/whdsl/pkg/metrics"
 	"net/http"
 	"os"
+	"path"
 
-	middleware "github.com/deepmap/oapi-codegen/pkg/gin-middleware"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/toorop/gin-logrus"
@@ -27,13 +30,27 @@ func NewServer(service *api.Service, port int) *http.Server {
 	swagger.Servers = nil
 
 	r := gin.New()
+
 	r.Use(
 		ginlogrus.Logger(logrus.StandardLogger()),
 		gin.Recovery(),
-		middleware.OapiRequestValidator(swagger),
+		cors.Default(),
 	)
 
-	r = api.RegisterHandlers(r, service)
+	customHandlers := r.Group("/")
+	customHandlers.GET("/metrics", metrics.PrometheusHandler())
+
+	base, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	
+	customHandlers.StaticFile("/swagger/openapi.yaml", path.Join(base, "whdsl-api.yaml"))
+
+	apiHandlers := r.Group("/api/v1")
+	apiHandlers.Use(middleware.OapiRequestValidator(swagger))
+
+	apiHandlers = api.RegisterHandlers(apiHandlers,service)
 
 	s := &http.Server{
 		Handler: r,
