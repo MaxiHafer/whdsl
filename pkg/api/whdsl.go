@@ -1,18 +1,13 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"log"
-	"net/http"
-	"os"
-	"path"
+	"context"
 )
 
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest --config=types.cfg.yaml ../../whdsl-api.yaml
-//go:generate go run github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest --config=server.cfg.yaml ../../whdsl-api.yaml
+//go:generate oapi-codegen --config=types.cfg.yaml ../../openapi.yaml
+//go:generate oapi-codegen --config=server.cfg.yaml ../../openapi.yaml
 
-var _ ServerInterface = &Service{}
+var _ StrictServerInterface = &Service{}
 
 func NewService() *Service {
 	return &Service{}
@@ -21,66 +16,53 @@ func NewService() *Service {
 type Service struct {
 }
 
-func (s *Service) GetSwagger(c *gin.Context) {
-	log.Println("trying to serve openapi-spec")
-	wd, err := os.Getwd()
-	if err != nil {
-		_ = c.AbortWithError(http.StatusInternalServerError, err)
-	}
-	c.File(path.Join(wd,"whdsl-api.yaml"))
-}
-
-func (s *Service) GetMetrics(c *gin.Context) {
-	h := promhttp.Handler()
-	h.ServeHTTP(c.Writer, c.Request)
-}
-
-func (s *Service) GetArticles(c *gin.Context) {
-	// TODO implement me
+func (s Service) GetArticles(ctx context.Context, request GetArticlesRequestObject) (GetArticlesResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) PostArticles(c *gin.Context) {
-	// TODO implement me
+func (s Service) PostArticles(ctx context.Context, request PostArticlesRequestObject) (PostArticlesResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) DeleteArticlesId(c *gin.Context, id string) {
-	// TODO implement me
+func (s Service) DeleteArticlesId(ctx context.Context, request DeleteArticlesIdRequestObject) (DeleteArticlesIdResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) GetArticlesId(c *gin.Context, id string) {
-	// TODO implement me
+func (s Service) GetArticlesId(ctx context.Context, request GetArticlesIdRequestObject) (GetArticlesIdResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) PutArticlesId(c *gin.Context, id string) {
-	// TODO implement me
+func (s Service) PutArticlesId(ctx context.Context, request PutArticlesIdRequestObject) (PutArticlesIdResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) GetTransactions(c *gin.Context) {
-	// TODO implement me
+func (s Service) GetTransactions(ctx context.Context, request GetTransactionsRequestObject) (GetTransactionsResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) PostTransactions(c *gin.Context) {
-	// TODO implement me
+func (s Service) PostTransactions(ctx context.Context, request PostTransactionsRequestObject) (PostTransactionsResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) DeleteTransactionsId(c *gin.Context, id string) {
-	// TODO implement me
+func (s Service) DeleteTransactionsId(ctx context.Context, request DeleteTransactionsIdRequestObject) (DeleteTransactionsIdResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) GetTransactionsId(c *gin.Context, id string) {
-	// TODO implement me
+func (s Service) GetTransactionsId(ctx context.Context, request GetTransactionsIdRequestObject) (GetTransactionsIdResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
 
-func (s *Service) PutTransactionsId(c *gin.Context, id string) {
-	// TODO implement me
+func (s Service) PutTransactionsId(ctx context.Context, request PutTransactionsIdRequestObject) (PutTransactionsIdResponseObject, error) {
+	//TODO implement me
 	panic("implement me")
 }
+

@@ -1,0 +1,59 @@
+syntax = "proto3";
+package whdsl.article.v1;
+
+option go_package = "whdsl/article/v1;articlev1";
+
+import "google/protobuf/timestamp.proto";
+
+message Article {
+  string id = 1;
+  string name = 2;
+  int32 min_amount = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message GetArticleRequest {
+  string id = 1;
+}
+message GetArticleResponse {
+  Article article = 1;
+}
+
+message ListArticlesRequest {}
+message ListArticlesResponse {
+  repeated Article articles = 1;
+}
+
+message CreateArticleRequest {
+  string name = 1;
+  int32 min_amount = 2;
+}
+message CreateArticleResponse {
+  string id = 1;
+}
+
+message UpdateArticleRequest {
+  string id = 1;
+  string name = 2;
+  string min_amount = 3;
+}
+message UpdateArticleResponse{
+  string id = 1;
+}
+
+message DeleteArticleRequest {
+  string id = 1;
+}
+message DeleteArticleResponse {
+  string id = 1;
+}
+
+service ArticleService {
+  rpc GetArticle (GetArticleRequest) returns (GetArticleResponse) {}
+  rpc ListArticles (ListArticlesRequest) returns (ListArticlesResponse) {}
+  rpc CreateArticle (CreateArticleRequest) returns (CreateArticleResponse) {}
+  rpc UpdateArticle (UpdateArticleRequest) returns (UpdateArticleResponse){}
+  rpc DeleteArticle (DeleteArticleRequest) returns (DeleteArticleResponse){}
+}
+

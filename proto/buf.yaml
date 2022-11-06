@@ -1,0 +1,8 @@
+version: v1
+name: buf.build/maxihafer/whdsl
+breaking:
+  use:
+    - PACKAGE
+lint:
+  use:
+    - DEFAULT

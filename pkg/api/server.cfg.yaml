@@ -2,7 +2,7 @@ package: api
 generate:
   gin-server: true
   embedded-spec: true
-  strict: true
+  strict-server: true
 output: whdsl-server.gen.go
 output-options:
   user-templates:
