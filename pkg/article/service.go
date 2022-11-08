@@ -1,11 +1,18 @@
 package article
 
 import (
+	"context"
 	connect_go "github.com/bufbuild/connect-go"
+	"github.com/gin-gonic/gin"
 	v1 "github.com/maxihafer/whdsl/pkg/pb/whdsl/article/v1"
 	"github.com/maxihafer/whdsl/pkg/pb/whdsl/article/v1/articlev1connect"
 )
 var _ articlev1connect.ArticleServiceHandler = &Service{}
+
+func NewHandlerForService() (string, gin.HandlerFunc ) {
+	path, handler := articlev1connect.NewArticleServiceHandler(&Service{})
+	return path, gin.WrapH(handler)
+}
 
 type Service struct {
 	

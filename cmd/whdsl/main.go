@@ -1,13 +1,12 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/maxihafer/whdsl/pkg/article"
-	"github.com/maxihafer/whdsl/pkg/pb/whdsl/article/v1/articlev1connect"
-	"github.com/pkg/errors"
+	"github.com/maxihafer/whdsl/pkg/grpcreflect"
 	"github.com/sirupsen/logrus"
-	articlev1 "go.buf.build/grpc/go/maxihafer/whdsl/article/v1"
-	"google.golang.org/grpc"
-	"net"
+	ginlogrus "github.com/toorop/gin-logrus"
 )
 
 func main() {
@@ -17,22 +16,24 @@ func main() {
 }
 
 func run() error {
-	articleService := &article.Service{}
+	r := gin.New()
+	r.UseH2C = true
 
-	path, handler := articlev1connect.NewArticleServiceHandler(articleService)
+	r.Use(
+		gin.Recovery(),
+		cors.Default(),
+		ginlogrus.Logger(logrus.StandardLogger()),
+	)
 
-	listenOn := "127.0.0.1:8080"
-	listener, err := net.Listen("tcp", listenOn)
-	if err != nil {
-		return errors.Wrapf(err, "failed to listen on %s", listenOn)
-	}
+	r.Any(grpcreflect.ReflectorV1())
+	r.Any(grpcreflect.ReflectorV1Alpha())
 
-	server := grpc.NewServer()
-	articlev1.RegisterArticleServiceServer(server, &article.Service{})
-	logrus.Infof("listening on %s",listenOn)
+	articlePath, articleHandler := article.NewHandlerForService()
 
-	if err := server.Serve(listener); err != nil {
-		return errors.Wrap(err, "failed to serve gRPC server")
+	r.POST(articlePath, articleHandler)
+
+	if err := r.Run(":8080"); err != nil {
+		return err
 	}
 
 	return nil

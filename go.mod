@@ -4,16 +4,15 @@ go 1.19
 
 require (
 	github.com/bufbuild/connect-go v1.1.0
+	github.com/bufbuild/connect-grpcreflect-go v1.0.0
 	github.com/deepmap/oapi-codegen v1.12.2
 	github.com/getkin/kin-openapi v0.107.0
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.8.1
-	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/toorop/gin-logrus v0.0.0-20210225092905-2c785434f26f
-	go.buf.build/grpc/go/maxihafer/whdsl v1.4.3
-	google.golang.org/grpc v1.32.0
+	golang.org/x/net v0.1.0
 	google.golang.org/protobuf v1.28.1
 )
 
@@ -47,10 +46,8 @@ require (
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
-	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
-	google.golang.org/genproto v0.0.0-20200825200019-8632dd797987 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
