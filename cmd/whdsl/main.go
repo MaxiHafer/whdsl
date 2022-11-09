@@ -1,12 +1,19 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/maxihafer/whdsl/pkg/article"
-	"github.com/maxihafer/whdsl/pkg/grpcreflect"
+	"net/http"
+
 	"github.com/sirupsen/logrus"
-	ginlogrus "github.com/toorop/gin-logrus"
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+
+	"github.com/bufbuild/connect-grpcreflect-go"
+
+	"github.com/maxihafer/whdsl/cmd/whdsl/internal"
+	"github.com/maxihafer/whdsl/pkg/article"
+	"github.com/maxihafer/whdsl/pkg/pb/whdsl/article/v1/articlev1connect"
 )
 
 func main() {
@@ -16,23 +23,38 @@ func main() {
 }
 
 func run() error {
-	r := gin.New()
-	r.UseH2C = true
+	conf := internal.NewInitializedMariaDBConfigFromEnv()
+	dsn := conf.DSN()
 
-	r.Use(
-		gin.Recovery(),
-		cors.Default(),
-		ginlogrus.Logger(logrus.StandardLogger()),
+	logrus.WithField("dsn",dsn).Info("connecting to database")
+	db, err := gorm.Open(mysql.Open(dsn))
+	if err != nil {
+		return err
+	}
+
+	db.AutoMigrate(&article.Article{})
+	db.AutoMigrate(&article.Transaction{})
+
+	articleRepo := article.NewArticleRepository(db)
+	transactionRepo := article.NewTransactionRepository(db)
+
+	articleService := article.NewArticleService(articleRepo)
+	transactionService := article.NewTransactionService(transactionRepo)
+
+	mux := http.NewServeMux()
+	
+	reflector := grpcreflect.NewStaticReflector(
+		articlev1connect.ArticleServiceName,
+		articlev1connect.TransactionServiceName,
 	)
 
-	r.Any(grpcreflect.ReflectorV1())
-	r.Any(grpcreflect.ReflectorV1Alpha())
+	mux.Handle(grpcreflect.NewHandlerV1(reflector))
+	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
 
-	articlePath, articleHandler := article.NewHandlerForService()
+	mux.Handle(articlev1connect.NewArticleServiceHandler(articleService))
+	mux.Handle(articlev1connect.NewTransactionServiceHandler(transactionService))
 
-	r.POST(articlePath, articleHandler)
-
-	if err := r.Run(":8080"); err != nil {
+	if err := http.ListenAndServe("localhost:8080", h2c.NewHandler(mux, &http2.Server{})); err != nil {
 		return err
 	}
 

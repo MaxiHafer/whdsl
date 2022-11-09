@@ -29,3 +29,7 @@ buf-push: buf-lint buf-generate
 .PHONY: generate
 generate:
 	go generate ./...
+
+.PHONY: compose
+compose:
+	docker compose -f ./deploy/docker-compose.yaml up -d

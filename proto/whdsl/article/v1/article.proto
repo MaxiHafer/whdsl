@@ -4,56 +4,72 @@ package whdsl.article.v1;
 option go_package = "whdsl/article/v1;articlev1";
 
 import "google/protobuf/timestamp.proto";
+import "whdsl/article/v1/transaction.proto";
 
 message Article {
   string id = 1;
   string name = 2;
-  int32 min_amount = 3;
+  uint32 min_amount = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
 }
 
-message GetArticleRequest {
+message ShowTransactionsRequest {
   string id = 1;
 }
-message GetArticleResponse {
+message ShowTransactionsResponse {
+  repeated Transaction transactions = 1;
+}
+
+message CalculateAmountRequest {
+  string id = 1;
+}
+message CalculateAmountResponse {
+  uint32 amount = 1;
+}
+
+message ShowDetailsRequest {
+  string id = 1;
+}
+message ShowDetailsResponse {
   Article article = 1;
 }
 
-message ListArticlesRequest {}
-message ListArticlesResponse {
+message ShowAllRequest {}
+message ShowAllResponse {
   repeated Article articles = 1;
 }
 
-message CreateArticleRequest {
+message NewArticleRequest {
   string name = 1;
-  int32 min_amount = 2;
+  uint32 min_amount = 2;
 }
-message CreateArticleResponse {
+message NewArticleResponse {
   string id = 1;
 }
 
-message UpdateArticleRequest {
+message UpdateDetailsRequest {
   string id = 1;
   string name = 2;
-  string min_amount = 3;
+  uint32 min_amount = 3;
 }
-message UpdateArticleResponse{
+message UpdateDetailsResponse{
   string id = 1;
 }
 
-message DeleteArticleRequest {
+message RemoveArticleRequest {
   string id = 1;
 }
-message DeleteArticleResponse {
+message RemoveArticleResponse {
   string id = 1;
 }
 
 service ArticleService {
-  rpc GetArticle (GetArticleRequest) returns (GetArticleResponse) {}
-  rpc ListArticles (ListArticlesRequest) returns (ListArticlesResponse) {}
-  rpc CreateArticle (CreateArticleRequest) returns (CreateArticleResponse) {}
-  rpc UpdateArticle (UpdateArticleRequest) returns (UpdateArticleResponse){}
-  rpc DeleteArticle (DeleteArticleRequest) returns (DeleteArticleResponse){}
+  rpc ShowDetails(ShowDetailsRequest) returns (ShowDetailsResponse) {}
+  rpc ShowAll (ShowAllRequest) returns (ShowAllResponse) {}
+  rpc NewArticle (NewArticleRequest) returns (NewArticleResponse) {}
+  rpc UpdateDetails (UpdateDetailsRequest) returns (UpdateDetailsResponse){}
+  rpc RemoveArticle (RemoveArticleRequest) returns (RemoveArticleResponse){}
+  rpc ShowTransactions (ShowTransactionsRequest) returns (ShowTransactionsResponse){}
+  rpc CalculateAmount (CalculateAmountRequest) returns (CalculateAmountResponse) {}
 }
-

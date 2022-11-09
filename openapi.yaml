@@ -121,8 +121,8 @@ paths:
   /transactions:
     get:
       tags:
-        - transactions
-      summary: List all transactions
+        - transaction
+      summary: List all transaction
       responses:
         200:
           description: OK
@@ -134,7 +134,7 @@ paths:
                   $ref: '#/components/schemas/Transaction'
     post:
       tags:
-        - transactions
+        - transaction
       summary: Create a new trasaction
       requestBody:
         content:
@@ -158,7 +158,7 @@ paths:
   /transactions/{id}:
     get:
       tags:
-        - transactions
+        - transaction
       summary: Get an transaction
       parameters:
         - name: id
@@ -182,7 +182,7 @@ paths:
                 type: string
     put:
       tags:
-        - transactions
+        - transaction
       summary: Update a transaction
       parameters:
         - name: id
@@ -206,7 +206,7 @@ paths:
                 type: string
     delete:
       tags:
-        - transactions
+        - transaction
       summary: Delete a transaction
       parameters:
         - name: id

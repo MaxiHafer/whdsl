@@ -37,20 +37,20 @@ type ServerInterface interface {
 	// Update an article
 	// (PUT /articles/{id})
 	PutArticlesId(c *gin.Context, id string)
-	// List all transactions
-	// (GET /transactions)
+	// List all transaction
+	// (GET /transaction)
 	GetTransactions(c *gin.Context)
 	// Create a new trasaction
-	// (POST /transactions)
+	// (POST /transaction)
 	PostTransactions(c *gin.Context)
 	// Delete a transaction
-	// (DELETE /transactions/{id})
+	// (DELETE /transaction/{id})
 	DeleteTransactionsId(c *gin.Context, id string)
 	// Get an transaction
-	// (GET /transactions/{id})
+	// (GET /transaction/{id})
 	GetTransactionsId(c *gin.Context, id string)
 	// Update a transaction
-	// (PUT /transactions/{id})
+	// (PUT /transaction/{id})
 	PutTransactionsId(c *gin.Context, id string)
 }
 
@@ -257,15 +257,15 @@ func RegisterHandlersWithOptions(router *gin.RouterGroup, si ServerInterface, op
 
 	router.PUT(options.BaseURL+"/articles/:id", wrapper.PutArticlesId)
 
-	router.GET(options.BaseURL+"/transactions", wrapper.GetTransactions)
+	router.GET(options.BaseURL+"/transaction", wrapper.GetTransactions)
 
-	router.POST(options.BaseURL+"/transactions", wrapper.PostTransactions)
+	router.POST(options.BaseURL+"/transaction", wrapper.PostTransactions)
 
-	router.DELETE(options.BaseURL+"/transactions/:id", wrapper.DeleteTransactionsId)
+	router.DELETE(options.BaseURL+"/transaction/:id", wrapper.DeleteTransactionsId)
 
-	router.GET(options.BaseURL+"/transactions/:id", wrapper.GetTransactionsId)
+	router.GET(options.BaseURL+"/transaction/:id", wrapper.GetTransactionsId)
 
-	router.PUT(options.BaseURL+"/transactions/:id", wrapper.PutTransactionsId)
+	router.PUT(options.BaseURL+"/transaction/:id", wrapper.PutTransactionsId)
 
 	return router
 }
@@ -527,20 +527,20 @@ type StrictServerInterface interface {
 	// Update an article
 	// (PUT /articles/{id})
 	PutArticlesId(ctx context.Context, request PutArticlesIdRequestObject) (PutArticlesIdResponseObject, error)
-	// List all transactions
-	// (GET /transactions)
+	// List all transaction
+	// (GET /transaction)
 	GetTransactions(ctx context.Context, request GetTransactionsRequestObject) (GetTransactionsResponseObject, error)
 	// Create a new trasaction
-	// (POST /transactions)
+	// (POST /transaction)
 	PostTransactions(ctx context.Context, request PostTransactionsRequestObject) (PostTransactionsResponseObject, error)
 	// Delete a transaction
-	// (DELETE /transactions/{id})
+	// (DELETE /transaction/{id})
 	DeleteTransactionsId(ctx context.Context, request DeleteTransactionsIdRequestObject) (DeleteTransactionsIdResponseObject, error)
 	// Get an transaction
-	// (GET /transactions/{id})
+	// (GET /transaction/{id})
 	GetTransactionsId(ctx context.Context, request GetTransactionsIdRequestObject) (GetTransactionsIdResponseObject, error)
 	// Update a transaction
-	// (PUT /transactions/{id})
+	// (PUT /transaction/{id})
 	PutTransactionsId(ctx context.Context, request PutTransactionsIdRequestObject) (PutTransactionsIdResponseObject, error)
 }
 
