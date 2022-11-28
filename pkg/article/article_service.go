@@ -40,7 +40,7 @@ func (s *ArticleService) CalculateAmount(ctx context.Context, c *connect.Request
 		return nil, err
 	}
 
-	var amount uint32
+	var amount int32
 	for _, agg := range aggs {
 		switch agg.Type {
 		case v1.Transaction_TYPE_IN:

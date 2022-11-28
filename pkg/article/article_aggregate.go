@@ -1,8 +1,6 @@
 package article
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -20,9 +18,7 @@ type Article struct {
 	gorm.Model
 	ID string
 	Name string
-	MinAmount uint32
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	MinAmount int32
 }
 
 func (a *Article) ToProto() *v1.Article {

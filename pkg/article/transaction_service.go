@@ -2,7 +2,6 @@ package article
 
 import (
 	"context"
-	"time"
 
 	"github.com/bufbuild/connect-go"
 	"github.com/pkg/errors"
@@ -52,8 +51,6 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, c *connect.R
 	agg.Count = c.Msg.GetCount()
 	agg.Type = c.Msg.GetType()
 	agg.ArticleID = c.Msg.GetArticleId()
-	agg.CreatedAt = time.Now()
-	agg.UpdatedAt = time.Now()
 
 	found, err := s.r.AssertArticleForIDPresent(c.Msg.GetArticleId())
 	if err != nil {

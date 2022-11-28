@@ -1,0 +1,13 @@
+articles:
+  - name: Käse
+    min-amount: 50
+    transactions:
+      - type: IN
+        amount: 100
+  - name: Schinken
+    min-amount: 100
+    transactions:
+      - type: IN
+        amount: 500
+      - type: Out
+        amount: 100

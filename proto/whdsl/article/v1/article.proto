@@ -9,7 +9,7 @@ import "whdsl/article/v1/transaction.proto";
 message Article {
   string id = 1;
   string name = 2;
-  uint32 min_amount = 3;
+  int32 min_amount = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
 }
@@ -25,7 +25,7 @@ message CalculateAmountRequest {
   string id = 1;
 }
 message CalculateAmountResponse {
-  uint32 amount = 1;
+  int32 amount = 1;
 }
 
 message ShowDetailsRequest {
@@ -42,7 +42,7 @@ message ShowAllResponse {
 
 message NewArticleRequest {
   string name = 1;
-  uint32 min_amount = 2;
+  int32 min_amount = 2;
 }
 message NewArticleResponse {
   string id = 1;
@@ -51,7 +51,7 @@ message NewArticleResponse {
 message UpdateDetailsRequest {
   string id = 1;
   string name = 2;
-  uint32 min_amount = 3;
+  int32 min_amount = 3;
 }
 message UpdateDetailsResponse{
   string id = 1;

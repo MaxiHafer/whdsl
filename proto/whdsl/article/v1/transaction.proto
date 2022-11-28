@@ -9,7 +9,7 @@ message Transaction {
   string id = 1;
   string article_id = 2;
   Type type = 3;
-  uint32 count = 4;
+  int32 count = 4;
   google.protobuf.Timestamp created_at = 5;
   google.protobuf.Timestamp updated_at = 6;
 
@@ -35,7 +35,7 @@ message ListTransactionsResponse {
 message CreateTransactionRequest {
   string article_id = 1;
   Transaction.Type type = 2;
-  uint32 count = 3;
+  int32 count = 3;
 }
 message CreateTransactionResponse {
   string id = 1;
@@ -45,7 +45,7 @@ message UpdateTransactionRequest {
   string id = 1;
   string article_id = 2;
   Transaction.Type type = 3;
-  uint32 count = 4;
+  int32 count = 4;
 }
 message UpdateTransactionResponse{
   string id = 1;

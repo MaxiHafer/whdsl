@@ -1,10 +1,12 @@
 package article
 
 import (
+	"github.com/bufbuild/connect-go"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 
 	"github.com/maxihafer/whdsl/pkg/grpc"
+	v1 "github.com/maxihafer/whdsl/pkg/pb/whdsl/article/v1"
 )
 
 func NewTransactionRepository(db *gorm.DB) *TransactionRepository {
@@ -30,6 +32,26 @@ func (r *TransactionRepository) AssertArticleForIDPresent(id string) (bool, erro
 }
 
 func (r *TransactionRepository) Store(agg *Transaction) error {
+	count := Count{ID: agg.ArticleID}
+
+	if err := r.db.FirstOrInit(&count, count).Error; err != nil {
+		return grpc.ErrInternal(err)
+	}
+
+	switch agg.Type {
+	case v1.Transaction_TYPE_IN:
+		count.Count += agg.Count
+	case v1.Transaction_TYPE_OUT:
+		if newCount := count.Count - agg.Count; newCount < 0 {
+			return connect.NewError(connect.CodeInvalidArgument, errors.New("transaction would reduce count below zero"))
+		}
+		count.Count -= agg.Count
+	}
+
+	if res := r.db.Save(&count); res.Error != nil {
+		return grpc.ErrInternal(res.Error)
+	}
+
 	if res := r.db.Create(agg); res.Error != nil {
 		return res.Error
 	}
@@ -57,7 +79,7 @@ func (r *TransactionRepository) List() ([]*Transaction, error) {
 			return nil, grpc.ErrNotFound(res.Error)
 		}
 	}
-	
+
 	return aggs, nil
 }
 

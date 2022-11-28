@@ -1,8 +1,6 @@
 package article
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -22,9 +20,7 @@ type Transaction struct {
 	ID        string
 	ArticleID string
 	Type      v1.Transaction_Type
-	Count     uint32
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Count     int32
 }
 
 func (a *Transaction) ToProto() *v1.Transaction {
