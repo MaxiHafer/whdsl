@@ -1,10 +1,7 @@
 package internal
 
 import (
-	"log"
 	"net/http"
-	"os"
-	"time"
 
 	grpcreflect "github.com/bufbuild/connect-grpcreflect-go"
 	"github.com/sirupsen/logrus"
@@ -12,13 +9,14 @@ import (
 	"golang.org/x/net/http2/h2c"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 
 	"github.com/maxihafer/whdsl/pkg/article"
 	"github.com/maxihafer/whdsl/pkg/pb/whdsl/article/v1/articlev1connect"
+	"github.com/maxihafer/whdsl/pkg/pb/whdsl/transaction/v1/transactionv1connect"
+	"github.com/maxihafer/whdsl/pkg/transaction"
 )
 
-func NewServerFromEnv() (*Server, error){
+func NewServerFromEnv() (*Server, error) {
 	s := &Server{}
 
 	conf := NewMariaDBConfigFromEnv()
@@ -32,22 +30,18 @@ type Server struct {
 	conf *MariadbConfig
 
 	db                 *gorm.DB
-	articleRepo        *article.ArticleRepository
-	transactionRepo    *article.TransactionRepository
-	articleService     *article.ArticleService
-	transactionService *article.TransactionService
+	articleRepo        *article.Repository
+	transactionRepo    *transaction.Repository
+	articleService     *article.Service
+	transactionService *transaction.Service
 }
 
 func (s *Server) runMigrations() error {
-	if err := s.db.AutoMigrate(&article.Count{}); err != nil {
+
+	if err := s.db.Migrator().DropTable(&article.Article{}, &transaction.Transaction{}); err != nil {
 		return err
 	}
-
-	if err := s.db.AutoMigrate(&article.Article{}); err != nil {
-		return err
-	}
-
-	if err := s.db.AutoMigrate(&article.Transaction{}); err != nil {
+	if err := s.db.Migrator().CreateTable(&article.Article{}, &transaction.Transaction{}); err != nil {
 		return err
 	}
 
@@ -55,31 +49,22 @@ func (s *Server) runMigrations() error {
 }
 
 func (s *Server) bootstrapRepositories() {
-	s.articleRepo = article.NewArticleRepository(s.db)
-	s.transactionRepo = article.NewTransactionRepository(s.db)
+	s.articleRepo = article.NewRepository(s.db)
+	s.transactionRepo = transaction.NewRepository(s.db)
 
 }
 
-func (s *Server) bootstrapServices(){
-	s.articleService = article.NewArticleService(s.articleRepo)
-	s.transactionService = article.NewTransactionService(s.transactionRepo)
+func (s *Server) bootstrapServices() {
+	s.articleService = article.NewService(s.articleRepo)
+	s.transactionService = transaction.NewService(s.transactionRepo)
 }
 
 func (s *Server) Run() error {
 	logrus.WithField("dsn", s.conf.DSN()).Info("connecting to database")
 	var err error
-	
+
 	s.db, err = gorm.Open(
-		mysql.Open(s.conf.DSN()), &gorm.Config{
-			Logger: logger.New(
-				log.New(os.Stdout, "\r\n", log.LstdFlags),
-				logger.Config{
-					SlowThreshold: time.Second,
-					Colorful:      true,
-					LogLevel:      logger.Info,
-				},
-			),
-		},
+		mysql.Open(s.conf.DSN()), &gorm.Config{},
 	)
 	if err != nil {
 		return err
@@ -90,21 +75,21 @@ func (s *Server) Run() error {
 	}
 
 	s.bootstrapRepositories()
-	
+
 	s.bootstrapServices()
 
 	mux := http.NewServeMux()
 
 	reflector := grpcreflect.NewStaticReflector(
 		articlev1connect.ArticleServiceName,
-		articlev1connect.TransactionServiceName,
+		transactionv1connect.TransactionServiceName,
 	)
 
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
 
 	mux.Handle(articlev1connect.NewArticleServiceHandler(s.articleService))
-	mux.Handle(articlev1connect.NewTransactionServiceHandler(s.transactionService))
+	mux.Handle(transactionv1connect.NewTransactionServiceHandler(s.transactionService))
 
 	if err := http.ListenAndServe("localhost:8080", h2c.NewHandler(mux, &http2.Server{})); err != nil {
 		return err

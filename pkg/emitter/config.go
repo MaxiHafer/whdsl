@@ -11,11 +11,11 @@ type Config struct {
 type ArticleConfig struct {
 	Name          string
 	MinimumAmount int            `yaml:"min-amount"`
-	Transactions  []*Transaction `yaml:",flow"`
+	Order         *OrderConfig   `yaml:"order"`
 }
 
-type Transaction struct {
-	deplay time.Duration `yaml:"deplay"`
-	Type   string `yaml:"type"`
-	Amount int    `yaml:"amount"`
+type OrderConfig struct {
+	Frequency time.Duration
+	LowerBound int `yaml:"max-out"`
+	UpperBound int `yaml:"max-in"`
 }

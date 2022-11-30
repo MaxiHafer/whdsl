@@ -1,0 +1,68 @@
+syntax = "proto3";
+package whdsl.transaction.v1;
+
+option go_package = "whdsl/transaction/v1;transactionv1";
+
+import "google/protobuf/timestamp.proto";
+
+message Transaction {
+  string id = 1;
+  string article_id = 2;
+  Type type = 3;
+  int32 count = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_IN = 1;
+    TYPE_OUT = 2;
+  }
+}
+
+message ShowDetailsRequest {
+  string id = 1;
+}
+message ShowDetailsResponse {
+  Transaction transaction = 1;
+}
+
+message ShowAllRequest {}
+message ShowAllResponse {
+  repeated Transaction transactions = 1;
+}
+
+message NewTransactionRequest {
+  string article_id = 1;
+  Transaction.Type type = 2;
+  int32 count = 3;
+}
+message NewTransactionResponse {
+  string id = 1;
+}
+
+message UpdateDetailsRequest {
+  string id = 1;
+  string article_id = 2;
+  Transaction.Type type = 3;
+  int32 count = 4;
+}
+message UpdateDetailsResponse{
+  string id = 1;
+}
+
+message DeleteTransactionRequest {
+  string id = 1;
+}
+message DeleteTransactionResponse {
+  string id = 1;
+}
+
+service TransactionService {
+  rpc ShowDetails (ShowDetailsRequest) returns (ShowDetailsResponse) {}
+  rpc ShowAll (ShowAllRequest) returns (ShowAllResponse) {}
+  rpc NewTransaction (NewTransactionRequest) returns (NewTransactionResponse) {}
+  rpc UpdateDetails (UpdateDetailsRequest) returns (UpdateDetailsResponse){}
+  rpc DeleteTransaction (DeleteTransactionRequest) returns (DeleteTransactionResponse){}
+}
+

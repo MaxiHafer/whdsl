@@ -22,7 +22,7 @@ type MariadbConfig struct {
 
 func (c *MariadbConfig) DSN() string {
 	return fmt.Sprintf(
-		"%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		"%s:%s@(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=UTC",
 		c.User,
 		c.Password,
 		c.Hostname,

@@ -28,12 +28,11 @@ const (
 // ArticleServiceClient is a client for the whdsl.article.v1.ArticleService service.
 type ArticleServiceClient interface {
 	ShowDetails(context.Context, *connect_go.Request[v1.ShowDetailsRequest]) (*connect_go.Response[v1.ShowDetailsResponse], error)
+	ShowDetailsForName(context.Context, *connect_go.Request[v1.ShowDetailsForNameRequest]) (*connect_go.Response[v1.ShowDetailsForNameResponse], error)
 	ShowAll(context.Context, *connect_go.Request[v1.ShowAllRequest]) (*connect_go.Response[v1.ShowAllResponse], error)
 	NewArticle(context.Context, *connect_go.Request[v1.NewArticleRequest]) (*connect_go.Response[v1.NewArticleResponse], error)
 	UpdateDetails(context.Context, *connect_go.Request[v1.UpdateDetailsRequest]) (*connect_go.Response[v1.UpdateDetailsResponse], error)
 	RemoveArticle(context.Context, *connect_go.Request[v1.RemoveArticleRequest]) (*connect_go.Response[v1.RemoveArticleResponse], error)
-	ShowTransactions(context.Context, *connect_go.Request[v1.ShowTransactionsRequest]) (*connect_go.Response[v1.ShowTransactionsResponse], error)
-	CalculateAmount(context.Context, *connect_go.Request[v1.CalculateAmountRequest]) (*connect_go.Response[v1.CalculateAmountResponse], error)
 }
 
 // NewArticleServiceClient constructs a client for the whdsl.article.v1.ArticleService service. By
@@ -49,6 +48,11 @@ func NewArticleServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 		showDetails: connect_go.NewClient[v1.ShowDetailsRequest, v1.ShowDetailsResponse](
 			httpClient,
 			baseURL+"/whdsl.article.v1.ArticleService/ShowDetails",
+			opts...,
+		),
+		showDetailsForName: connect_go.NewClient[v1.ShowDetailsForNameRequest, v1.ShowDetailsForNameResponse](
+			httpClient,
+			baseURL+"/whdsl.article.v1.ArticleService/ShowDetailsForName",
 			opts...,
 		),
 		showAll: connect_go.NewClient[v1.ShowAllRequest, v1.ShowAllResponse](
@@ -71,33 +75,27 @@ func NewArticleServiceClient(httpClient connect_go.HTTPClient, baseURL string, o
 			baseURL+"/whdsl.article.v1.ArticleService/RemoveArticle",
 			opts...,
 		),
-		showTransactions: connect_go.NewClient[v1.ShowTransactionsRequest, v1.ShowTransactionsResponse](
-			httpClient,
-			baseURL+"/whdsl.article.v1.ArticleService/ShowTransactions",
-			opts...,
-		),
-		calculateAmount: connect_go.NewClient[v1.CalculateAmountRequest, v1.CalculateAmountResponse](
-			httpClient,
-			baseURL+"/whdsl.article.v1.ArticleService/CalculateAmount",
-			opts...,
-		),
 	}
 }
 
 // articleServiceClient implements ArticleServiceClient.
 type articleServiceClient struct {
-	showDetails      *connect_go.Client[v1.ShowDetailsRequest, v1.ShowDetailsResponse]
-	showAll          *connect_go.Client[v1.ShowAllRequest, v1.ShowAllResponse]
-	newArticle       *connect_go.Client[v1.NewArticleRequest, v1.NewArticleResponse]
-	updateDetails    *connect_go.Client[v1.UpdateDetailsRequest, v1.UpdateDetailsResponse]
-	removeArticle    *connect_go.Client[v1.RemoveArticleRequest, v1.RemoveArticleResponse]
-	showTransactions *connect_go.Client[v1.ShowTransactionsRequest, v1.ShowTransactionsResponse]
-	calculateAmount  *connect_go.Client[v1.CalculateAmountRequest, v1.CalculateAmountResponse]
+	showDetails        *connect_go.Client[v1.ShowDetailsRequest, v1.ShowDetailsResponse]
+	showDetailsForName *connect_go.Client[v1.ShowDetailsForNameRequest, v1.ShowDetailsForNameResponse]
+	showAll            *connect_go.Client[v1.ShowAllRequest, v1.ShowAllResponse]
+	newArticle         *connect_go.Client[v1.NewArticleRequest, v1.NewArticleResponse]
+	updateDetails      *connect_go.Client[v1.UpdateDetailsRequest, v1.UpdateDetailsResponse]
+	removeArticle      *connect_go.Client[v1.RemoveArticleRequest, v1.RemoveArticleResponse]
 }
 
 // ShowDetails calls whdsl.article.v1.ArticleService.ShowDetails.
 func (c *articleServiceClient) ShowDetails(ctx context.Context, req *connect_go.Request[v1.ShowDetailsRequest]) (*connect_go.Response[v1.ShowDetailsResponse], error) {
 	return c.showDetails.CallUnary(ctx, req)
+}
+
+// ShowDetailsForName calls whdsl.article.v1.ArticleService.ShowDetailsForName.
+func (c *articleServiceClient) ShowDetailsForName(ctx context.Context, req *connect_go.Request[v1.ShowDetailsForNameRequest]) (*connect_go.Response[v1.ShowDetailsForNameResponse], error) {
+	return c.showDetailsForName.CallUnary(ctx, req)
 }
 
 // ShowAll calls whdsl.article.v1.ArticleService.ShowAll.
@@ -120,25 +118,14 @@ func (c *articleServiceClient) RemoveArticle(ctx context.Context, req *connect_g
 	return c.removeArticle.CallUnary(ctx, req)
 }
 
-// ShowTransactions calls whdsl.article.v1.ArticleService.ShowTransactions.
-func (c *articleServiceClient) ShowTransactions(ctx context.Context, req *connect_go.Request[v1.ShowTransactionsRequest]) (*connect_go.Response[v1.ShowTransactionsResponse], error) {
-	return c.showTransactions.CallUnary(ctx, req)
-}
-
-// CalculateAmount calls whdsl.article.v1.ArticleService.CalculateAmount.
-func (c *articleServiceClient) CalculateAmount(ctx context.Context, req *connect_go.Request[v1.CalculateAmountRequest]) (*connect_go.Response[v1.CalculateAmountResponse], error) {
-	return c.calculateAmount.CallUnary(ctx, req)
-}
-
 // ArticleServiceHandler is an implementation of the whdsl.article.v1.ArticleService service.
 type ArticleServiceHandler interface {
 	ShowDetails(context.Context, *connect_go.Request[v1.ShowDetailsRequest]) (*connect_go.Response[v1.ShowDetailsResponse], error)
+	ShowDetailsForName(context.Context, *connect_go.Request[v1.ShowDetailsForNameRequest]) (*connect_go.Response[v1.ShowDetailsForNameResponse], error)
 	ShowAll(context.Context, *connect_go.Request[v1.ShowAllRequest]) (*connect_go.Response[v1.ShowAllResponse], error)
 	NewArticle(context.Context, *connect_go.Request[v1.NewArticleRequest]) (*connect_go.Response[v1.NewArticleResponse], error)
 	UpdateDetails(context.Context, *connect_go.Request[v1.UpdateDetailsRequest]) (*connect_go.Response[v1.UpdateDetailsResponse], error)
 	RemoveArticle(context.Context, *connect_go.Request[v1.RemoveArticleRequest]) (*connect_go.Response[v1.RemoveArticleResponse], error)
-	ShowTransactions(context.Context, *connect_go.Request[v1.ShowTransactionsRequest]) (*connect_go.Response[v1.ShowTransactionsResponse], error)
-	CalculateAmount(context.Context, *connect_go.Request[v1.CalculateAmountRequest]) (*connect_go.Response[v1.CalculateAmountResponse], error)
 }
 
 // NewArticleServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -151,6 +138,11 @@ func NewArticleServiceHandler(svc ArticleServiceHandler, opts ...connect_go.Hand
 	mux.Handle("/whdsl.article.v1.ArticleService/ShowDetails", connect_go.NewUnaryHandler(
 		"/whdsl.article.v1.ArticleService/ShowDetails",
 		svc.ShowDetails,
+		opts...,
+	))
+	mux.Handle("/whdsl.article.v1.ArticleService/ShowDetailsForName", connect_go.NewUnaryHandler(
+		"/whdsl.article.v1.ArticleService/ShowDetailsForName",
+		svc.ShowDetailsForName,
 		opts...,
 	))
 	mux.Handle("/whdsl.article.v1.ArticleService/ShowAll", connect_go.NewUnaryHandler(
@@ -173,16 +165,6 @@ func NewArticleServiceHandler(svc ArticleServiceHandler, opts ...connect_go.Hand
 		svc.RemoveArticle,
 		opts...,
 	))
-	mux.Handle("/whdsl.article.v1.ArticleService/ShowTransactions", connect_go.NewUnaryHandler(
-		"/whdsl.article.v1.ArticleService/ShowTransactions",
-		svc.ShowTransactions,
-		opts...,
-	))
-	mux.Handle("/whdsl.article.v1.ArticleService/CalculateAmount", connect_go.NewUnaryHandler(
-		"/whdsl.article.v1.ArticleService/CalculateAmount",
-		svc.CalculateAmount,
-		opts...,
-	))
 	return "/whdsl.article.v1.ArticleService/", mux
 }
 
@@ -191,6 +173,10 @@ type UnimplementedArticleServiceHandler struct{}
 
 func (UnimplementedArticleServiceHandler) ShowDetails(context.Context, *connect_go.Request[v1.ShowDetailsRequest]) (*connect_go.Response[v1.ShowDetailsResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("whdsl.article.v1.ArticleService.ShowDetails is not implemented"))
+}
+
+func (UnimplementedArticleServiceHandler) ShowDetailsForName(context.Context, *connect_go.Request[v1.ShowDetailsForNameRequest]) (*connect_go.Response[v1.ShowDetailsForNameResponse], error) {
+	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("whdsl.article.v1.ArticleService.ShowDetailsForName is not implemented"))
 }
 
 func (UnimplementedArticleServiceHandler) ShowAll(context.Context, *connect_go.Request[v1.ShowAllRequest]) (*connect_go.Response[v1.ShowAllResponse], error) {
@@ -207,12 +193,4 @@ func (UnimplementedArticleServiceHandler) UpdateDetails(context.Context, *connec
 
 func (UnimplementedArticleServiceHandler) RemoveArticle(context.Context, *connect_go.Request[v1.RemoveArticleRequest]) (*connect_go.Response[v1.RemoveArticleResponse], error) {
 	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("whdsl.article.v1.ArticleService.RemoveArticle is not implemented"))
-}
-
-func (UnimplementedArticleServiceHandler) ShowTransactions(context.Context, *connect_go.Request[v1.ShowTransactionsRequest]) (*connect_go.Response[v1.ShowTransactionsResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("whdsl.article.v1.ArticleService.ShowTransactions is not implemented"))
-}
-
-func (UnimplementedArticleServiceHandler) CalculateAmount(context.Context, *connect_go.Request[v1.CalculateAmountRequest]) (*connect_go.Response[v1.CalculateAmountResponse], error) {
-	return nil, connect_go.NewError(connect_go.CodeUnimplemented, errors.New("whdsl.article.v1.ArticleService.CalculateAmount is not implemented"))
 }

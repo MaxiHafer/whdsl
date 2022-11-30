@@ -1,0 +1,10 @@
+articles:
+  - name: Brot
+    min-amount: 50
+    order:
+      frequency: 10s
+  - name: Schinken
+    min-amount: 100
+    order:
+      frequency: 5s
+  - name:

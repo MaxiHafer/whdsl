@@ -1,6 +1,6 @@
 .PHONY: run
 run: build
-	./bin/whdsl
+	./bin/whdsl server
 
 .PHONY: dep
 dep:

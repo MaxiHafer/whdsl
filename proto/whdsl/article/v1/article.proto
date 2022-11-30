@@ -4,7 +4,6 @@ package whdsl.article.v1;
 option go_package = "whdsl/article/v1;articlev1";
 
 import "google/protobuf/timestamp.proto";
-import "whdsl/article/v1/transaction.proto";
 
 message Article {
   string id = 1;
@@ -14,24 +13,18 @@ message Article {
   google.protobuf.Timestamp updated_at = 5;
 }
 
-message ShowTransactionsRequest {
-  string id = 1;
-}
-message ShowTransactionsResponse {
-  repeated Transaction transactions = 1;
-}
-
-message CalculateAmountRequest {
-  string id = 1;
-}
-message CalculateAmountResponse {
-  int32 amount = 1;
-}
-
 message ShowDetailsRequest {
   string id = 1;
 }
 message ShowDetailsResponse {
+  Article article = 1;
+}
+
+message ShowDetailsForNameRequest {
+  string name = 1;
+}
+
+message ShowDetailsForNameResponse {
   Article article = 1;
 }
 
@@ -66,10 +59,9 @@ message RemoveArticleResponse {
 
 service ArticleService {
   rpc ShowDetails(ShowDetailsRequest) returns (ShowDetailsResponse) {}
+  rpc ShowDetailsForName(ShowDetailsForNameRequest) returns (ShowDetailsForNameResponse) {}
   rpc ShowAll (ShowAllRequest) returns (ShowAllResponse) {}
   rpc NewArticle (NewArticleRequest) returns (NewArticleResponse) {}
   rpc UpdateDetails (UpdateDetailsRequest) returns (UpdateDetailsResponse){}
   rpc RemoveArticle (RemoveArticleRequest) returns (RemoveArticleResponse){}
-  rpc ShowTransactions (ShowTransactionsRequest) returns (ShowTransactionsResponse){}
-  rpc CalculateAmount (CalculateAmountRequest) returns (CalculateAmountResponse) {}
-}
+};

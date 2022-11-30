@@ -11,3 +11,7 @@ func ErrNotFound(err error) *connect.Error {
 func ErrInternal(err error) *connect.Error {
 	return connect.NewError(connect.CodeInternal, err)
 }
+
+func ErrExists(err error) *connect.Error {
+	return connect.NewError(connect.CodeAlreadyExists, err)
+}
