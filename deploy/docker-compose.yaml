@@ -62,6 +62,7 @@ services:
     environment:
       MARIADB_ROOT_PASSWORD: mariadbroot
       MARIADB_DATABASE: whdsl_data
+      TZ: UTC
     networks:
       - backend
     ports:

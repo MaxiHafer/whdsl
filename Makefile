@@ -1,32 +1,35 @@
-DOCKER_COMPOSE := docker compose -p whdsl -f deploy/docker-compose.yaml
-
 .PHONY: run
-run: all
-	bin/api
+run: build
+	./bin/whdsl server
 
-.PHONY: all
-all: swagger build
+.PHONY: dep
+dep:
+	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@master
 
 .PHONY: build
 build:
-	go build -o bin/api cmd/whdsl/main.go
+	go build -o bin/whdsl cmd/whdsl/main.go
 
-.PHONY: run
-run: all
+.PHONY: buf
+buf: buf-push
 
-.PHONY: client
-client:
-	go install github.com/deepmap/oapi-codegen/cmd/oapi-codegen@latest
-	oapi-codegen -generate client,types -o ./pkg/client/client_gen.go -package client --old-config-style ./openapi.yaml
+.PHONY: buf-lint
+buf-lint:
+	docker run -v $(shell pwd):/work --workdir /work bufbuild/buf lint proto
 
+.PHONY: buf-generate
+buf-generate: buf-lint
+	docker run -v $(shell pwd):/work --workdir /work/proto bufbuild/buf generate
+	sudo chown -R $(shell id -u):$(shell id -g) pkg/pb
+
+.PHONY: buf-push
+buf-push: buf-lint buf-generate
+	docker run -v $(HOME)/.netrc:/root/.netrc -v $(shell pwd):/work --workdir /work bufbuild/buf push proto
+
+.PHONY: generate
+generate:
+	go generate ./...
 
 .PHONY: compose
 compose:
-	$(DOCKER_COMPOSE) pull
-	$(DOCKER_COMPOSE) up -d
-	sleep 3
-	$(DOCKER_COMPOSE) logs -f
-
-.PHONY: remove
-remove:
-	$(DOCKER_COMPOSE) down -v
+	docker compose -f ./deploy/docker-compose.yaml up -d

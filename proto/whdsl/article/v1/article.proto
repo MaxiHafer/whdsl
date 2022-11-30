@@ -1,0 +1,67 @@
+syntax = "proto3";
+package whdsl.article.v1;
+
+option go_package = "whdsl/article/v1;articlev1";
+
+import "google/protobuf/timestamp.proto";
+
+message Article {
+  string id = 1;
+  string name = 2;
+  int32 min_amount = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp updated_at = 5;
+}
+
+message ShowDetailsRequest {
+  string id = 1;
+}
+message ShowDetailsResponse {
+  Article article = 1;
+}
+
+message ShowDetailsForNameRequest {
+  string name = 1;
+}
+
+message ShowDetailsForNameResponse {
+  Article article = 1;
+}
+
+message ShowAllRequest {}
+message ShowAllResponse {
+  repeated Article articles = 1;
+}
+
+message NewArticleRequest {
+  string name = 1;
+  int32 min_amount = 2;
+}
+message NewArticleResponse {
+  string id = 1;
+}
+
+message UpdateDetailsRequest {
+  string id = 1;
+  string name = 2;
+  int32 min_amount = 3;
+}
+message UpdateDetailsResponse{
+  string id = 1;
+}
+
+message RemoveArticleRequest {
+  string id = 1;
+}
+message RemoveArticleResponse {
+  string id = 1;
+}
+
+service ArticleService {
+  rpc ShowDetails(ShowDetailsRequest) returns (ShowDetailsResponse) {}
+  rpc ShowDetailsForName(ShowDetailsForNameRequest) returns (ShowDetailsForNameResponse) {}
+  rpc ShowAll (ShowAllRequest) returns (ShowAllResponse) {}
+  rpc NewArticle (NewArticleRequest) returns (NewArticleResponse) {}
+  rpc UpdateDetails (UpdateDetailsRequest) returns (UpdateDetailsResponse){}
+  rpc RemoveArticle (RemoveArticleRequest) returns (RemoveArticleResponse){}
+};

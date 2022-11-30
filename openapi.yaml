@@ -121,8 +121,8 @@ paths:
   /transactions:
     get:
       tags:
-        - transactions
-      summary: List all transactions
+        - transaction
+      summary: List all transaction
       responses:
         200:
           description: OK
@@ -134,7 +134,7 @@ paths:
                   $ref: '#/components/schemas/Transaction'
     post:
       tags:
-        - transactions
+        - transaction
       summary: Create a new trasaction
       requestBody:
         content:
@@ -158,7 +158,7 @@ paths:
   /transactions/{id}:
     get:
       tags:
-        - transactions
+        - transaction
       summary: Get an transaction
       parameters:
         - name: id
@@ -182,7 +182,7 @@ paths:
                 type: string
     put:
       tags:
-        - transactions
+        - transaction
       summary: Update a transaction
       parameters:
         - name: id
@@ -206,7 +206,7 @@ paths:
                 type: string
     delete:
       tags:
-        - transactions
+        - transaction
       summary: Delete a transaction
       parameters:
         - name: id
@@ -236,6 +236,8 @@ components:
         id:
           type: string
           format: uuid
+          x-oapi-codegen-extra-tags:
+            bun: ",pk,type:varchar(36)"
         name:
           type: string
         minAmount:
@@ -245,9 +247,13 @@ components:
         createdAt:
           type: string
           format: date-time
+          x-oapi-codegen-extra-tags:
+            bun: ",nullzero"
         updatedAt:
           type: string
           format: date-time
+          x-oapi-codegen-extra-tags:
+            bun: ",nullzero"
     Transaction:
       type: object
       properties:
@@ -270,7 +276,8 @@ components:
         updatedAt:
           type: string
           format: date-time
-
-
-
-
+    BaseModel:
+      x-go-type: bun.BaseModel
+      x-go-type-import:
+        name: BaseModel
+        path: github.com/uptrace/bun

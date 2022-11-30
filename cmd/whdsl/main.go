@@ -1,53 +1,69 @@
 package main
 
 import (
-	"context"
 	"os"
 
-	_ "github.com/go-sql-driver/mysql"
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v3"
 
-	"whdsl/cmd/whdsl/internal/emitter"
-	"whdsl/cmd/whdsl/internal/server"
+	"github.com/maxihafer/whdsl/cmd/whdsl/internal"
+	"github.com/maxihafer/whdsl/pkg/emitter"
 )
 
 func main() {
-	ctx := context.Background()
-
 	app := cli.App{
-		Name: "whdsl",
-		Description: "inventory management software for whdsl",
+		Name:        "whdsl-service",
+		Description: "Manage your inventory like a boss",
 		Commands: []*cli.Command{
 			{
-				Name: "serve",
-				Usage: "serve the backend api for inventory management",
+				Name:  "server",
+				Usage: "Start the grpc server and listen for calls",
 				Action: func(c *cli.Context) error {
-					svc := server.Server{}
+					s, err := internal.NewServerFromEnv()
 
-					return svc.Run(ctx)
+					if err != nil {
+						return err
+					}
+
+					return s.Run()
 				},
 			},
 			{
-				Name: "emitter",
-				Usage: "start the random transaction emitter",
-				Action: func(c *cli.Context) error {
-					svc := emitter.Server{}
+				Name:  "emitter",
+				Usage: "Start an emitter, providing demo data for the service",
+				Flags: []cli.Flag{
+					&cli.PathFlag{
+						Name:     "config",
+						Aliases:  []string{"c"},
+						Required: true,
+					},
+				},
+				Action: func(context *cli.Context) error {
+					path := context.Path("config")
 
-					defer func() {
-						err := svc.Close(ctx)
-						if err != nil {
-							logrus.Fatal(err)
-						}
-					}()
+					bytes, err := os.ReadFile(path)
+					if err != nil {
+						return err
+					}
 
-					return svc.Run(ctx)
+					emitterConfig := &emitter.Config{}
+					err = yaml.Unmarshal(bytes,emitterConfig)
+					if err != nil {
+						return err
+					}
+
+					c, err := internal.NewClientFromEnv(emitterConfig)
+					if err != nil {
+						return err
+					}
+
+					return c.Run(context.Context)
 				},
 			},
 		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
-		logrus.Fatal(err)
+		panic(err)
 	}
 }
